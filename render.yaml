@@ -1,73 +1,15 @@
-# render.yaml
-# Render Blueprint - Tek komutla tüm servisleri deploy et
-# https://render.com/docs/blueprint-spec
-
 services:
-  # ============================================
-  # NTFY SERVER
-  # ============================================
-  - type: web
-    name: valohub-ntfy
-    runtime: docker
-    repo: https://github.com/YOUR_USERNAME/valohub-ntfy
-    branch: main
-    rootDir: ntfy-config
-    plan: free
-    healthCheckPath: /
-    envVars:
-      - key: PORT
-        value: 80
-
-  # ============================================
-  # BACKEND API
-  # ============================================
   - type: web
     name: valohub-backend
-    runtime: node
-    repo: https://github.com/YOUR_USERNAME/valohub-ntfy
+    env: node
+    plan: free
     branch: main
     rootDir: backend
-    plan: free
     buildCommand: npm install
     startCommand: npm start
-    healthCheckPath: /health
+    healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
-      - key: WORKER_API_KEY
-        generateValue: true
-
-  # ============================================
-  # WORKER
-  # ============================================
-  - type: worker
-    name: valohub-worker
-    runtime: node
-    repo: https://github.com/YOUR_USERNAME/valohub-ntfy
-    branch: main
-    rootDir: worker
-    plan: free
-    buildCommand: npm install
-    startCommand: npm start
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: PORT
-        value: 3001
-      - key: BACKEND_URL
-        fromService:
-          name: valohub-backend
-          type: web
-          property: host
-      - key: NTFY_URL
-        fromService:
-          name: valohub-ntfy
-          type: web
-          property: host
-      - key: WORKER_API_KEY
-        fromService:
-          name: valohub-backend
-          type: web
-          envVarKey: WORKER_API_KEY
